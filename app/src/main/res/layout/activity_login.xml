@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_screen"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <ImageView
+            android:layout_width="104dp"
+            android:layout_height="104dp"
+            android:layout_marginTop="12dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/logo_cactus" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/brand_oxe"
+                android:textColor="@color/orange"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/brand_rest"
+                android:textColor="@color/white"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/login_subtitle"
+            android:textColor="@color/text2"
+            android:textSize="16sp" />
+
+        <!-- Opções de entrada -->
+        <LinearLayout
+            android:id="@+id/options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/opt_xtream"
+                    style="@style/OxeOptionCard">
+
+                    <ImageView
+                        style="@style/OxeOptionIcon"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_cloud" />
+
+                    <TextView
+                        style="@style/OxeOptionLabel"
+                        android:text="@string/opt_xtream" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/opt_m3u"
+                    style="@style/OxeOptionCard">
+
+                    <ImageView
+                        style="@style/OxeOptionIcon"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_link" />
+
+                    <TextView
+                        style="@style/OxeOptionLabel"
+                        android:text="@string/opt_m3u" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/opt_file"
+                    style="@style/OxeOptionCard">
+
+                    <ImageView
+                        style="@style/OxeOptionIcon"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_folder" />
+
+                    <TextView
+                        style="@style/OxeOptionLabel"
+                        android:text="@string/opt_file" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/opt_single"
+                    style="@style/OxeOptionCard">
+
+                    <ImageView
+                        style="@style/OxeOptionIcon"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_play_circle" />
+
+                    <TextView
+                        style="@style/OxeOptionLabel"
+                        android:text="@string/opt_single" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Formulário -->
+        <LinearLayout
+            android:id="@+id/form"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/form_side"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="@dimen/form_side"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/form_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/orange"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/name_input"
+                style="@style/OxeInput"
+                android:hint="@string/hint_name"
+                android:importantForAutofill="no"
+                android:inputType="text" />
+
+            <EditText
+                android:id="@+id/server_input"
+                style="@style/OxeInput"
+                android:hint="@string/hint_server"
+                android:importantForAutofill="no"
+                android:inputType="textUri" />
+
+            <EditText
+                android:id="@+id/user_input"
+                style="@style/OxeInput"
+                android:hint="@string/hint_user"
+                android:importantForAutofill="no"
+                android:inputType="text" />
+
+            <EditText
+                android:id="@+id/pass_input"
+                style="@style/OxeInput"
+                android:hint="@string/hint_pass"
+                android:importantForAutofill="no"
+                android:inputType="textPassword" />
+
+            <EditText
+                android:id="@+id/url_input"
+                style="@style/OxeInput"
+                android:hint="@string/hint_m3u_url"
+                android:importantForAutofill="no"
+                android:inputType="textUri" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/back_button"
+                    style="@style/OxeButtonSecondary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/back" />
+
+                <Button
+                    android:id="@+id/enter_button"
+                    style="@style/OxeButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/enter" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="16dp"
+            android:indeterminateTint="@color/orange"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/error_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:textColor="@color/error"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="@string/disclaimer"
+            android:textColor="#666666"
+            android:textSize="12sp" />
+    </LinearLayout>
+</ScrollView>

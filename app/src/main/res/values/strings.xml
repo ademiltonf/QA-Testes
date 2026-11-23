@@ -1,20 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">IPTV Player</string>
-    <string name="url_hint">URL da lista M3U</string>
-    <string name="load">Abrir</string>
-    <string name="file">Arquivo</string>
-    <string name="search_hint">Buscar canal</string>
-    <string name="all_groups">Todas as categorias</string>
-    <string name="start_message">Cole a URL da sua lista M3U e toque em Abrir.</string>
-    <string name="loading">Carregando lista…</string>
-    <string name="enter_url">Digite a URL da lista</string>
+    <string name="app_name">OXEIPTVPLAYER</string>
+    <string name="brand_oxe">OXE</string>
+    <string name="brand_rest">IPTVPLAYER</string>
+
+    <!-- Login -->
+    <string name="login_subtitle">Escolha como você quer entrar</string>
+    <string name="opt_xtream">Xtream Codes</string>
+    <string name="opt_m3u">Lista M3U (link)</string>
+    <string name="opt_file">Arquivo M3U</string>
+    <string name="opt_single">Link único</string>
+    <string name="hint_name">Nome da lista (opcional)</string>
+    <string name="hint_server">Servidor (ex: http://servidor.com:8080)</string>
+    <string name="hint_user">Usuário</string>
+    <string name="hint_pass">Senha</string>
+    <string name="hint_m3u_url">Link da lista M3U</string>
+    <string name="hint_stream_url">Link do canal (.m3u8 ou .ts)</string>
+    <string name="enter">Entrar</string>
+    <string name="play">Assistir</string>
+    <string name="back">Voltar</string>
+    <string name="err_fill">Preencha todos os campos</string>
     <string name="file_error">Não foi possível abrir o arquivo</string>
-    <string name="no_file_picker">Este aparelho não tem seletor de arquivos. Use a URL.</string>
-    <string name="load_error">Erro ao carregar a lista: %1$s</string>
-    <string name="channel_count">%1$d de %2$d canais</string>
+    <string name="no_file_picker">Este aparelho não tem seletor de arquivos. Use o link da lista.</string>
+    <string name="local_file">Arquivo local</string>
+    <string name="default_list_name">Minha lista</string>
+    <string name="disclaimer">Somos apenas um player. Não fornecemos listas, canais ou qualquer conteúdo.</string>
+
+    <!-- Início -->
+    <string name="live">Canais</string>
+    <string name="movies">Filmes</string>
+    <string name="series">Séries</string>
+    <string name="loading_short">Carregando…</string>
+    <string name="items_count">%1$d itens</string>
+    <string name="load_failed">Não foi possível carregar</string>
+    <string name="refresh">Atualizar</string>
+    <string name="logout">Sair</string>
+    <string name="logout_confirm">Deseja sair desta lista?</string>
+    <string name="cancel">Cancelar</string>
+    <string name="expiry">Válido até %1$s</string>
+
+    <!-- Navegação -->
+    <string name="search_hint">Buscar…</string>
+    <string name="all">Todos</string>
+    <string name="nothing_found">Nada encontrado</string>
+    <string name="load_error">Erro: %1$s</string>
+    <string name="seasons_count">%1$d temporada(s) · %2$d episódios</string>
+    <string name="season_n">Temporada %1$d</string>
+    <string name="episode_n">Episódio %1$d</string>
+
+    <!-- Player -->
     <string name="channel_info">%1$d. %2$s</string>
-    <string name="play_error">Não foi possível reproduzir este canal (%1$s).\nUse ▲▼ para trocar de canal.</string>
-    <string name="prev_channel">Canal anterior</string>
-    <string name="next_channel">Próximo canal</string>
+    <string name="play_error">Não foi possível reproduzir (%1$s).</string>
+    <string name="prev_channel">Anterior</string>
+    <string name="next_channel">Próximo</string>
 </resources>

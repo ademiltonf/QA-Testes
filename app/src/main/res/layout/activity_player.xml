@@ -9,7 +9,10 @@
         android:id="@+id/player_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:buffered_color="#66FFFFFF"
         app:keep_content_on_player_reset="true"
+        app:played_color="@color/orange"
+        app:scrubber_color="@color/orange"
         app:show_buffering="when_playing" />
 
     <TextView
@@ -18,11 +21,16 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top|start"
         android:layout_margin="24dp"
-        android:background="@color/overlay"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="8dp"
-        android:textColor="@android:color/white"
+        android:background="@drawable/overlay_bg"
+        android:gravity="center_vertical"
+        android:maxWidth="520dp"
+        android:paddingLeft="14dp"
+        android:paddingTop="8dp"
+        android:paddingRight="18dp"
+        android:paddingBottom="8dp"
+        android:textColor="@color/white"
         android:textSize="20sp"
+        android:textStyle="bold"
         android:visibility="gone" />
 
     <TextView
@@ -30,10 +38,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@color/overlay"
+        android:background="@drawable/overlay_bg"
         android:gravity="center"
-        android:padding="16dp"
-        android:textColor="@android:color/white"
+        android:padding="18dp"
+        android:textColor="@color/white"
         android:textSize="16sp"
         android:visibility="gone" />
 
@@ -45,6 +53,8 @@
         android:layout_marginStart="16dp"
         android:background="@drawable/round_button"
         android:contentDescription="@string/prev_channel"
+        android:padding="16dp"
+        android:scaleType="fitCenter"
         android:src="@drawable/ic_prev"
         android:visibility="gone" />
 
@@ -56,6 +66,8 @@
         android:layout_marginEnd="16dp"
         android:background="@drawable/round_button"
         android:contentDescription="@string/next_channel"
+        android:padding="16dp"
+        android:scaleType="fitCenter"
         android:src="@drawable/ic_next"
         android:visibility="gone" />
 </FrameLayout>

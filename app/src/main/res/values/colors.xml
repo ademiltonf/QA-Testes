@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#1E88E5</color>
-    <color name="primary_dark">#0D47A1</color>
-    <color name="accent">#42A5F5</color>
-    <color name="background">#121212</color>
-    <color name="text">#FFFFFF</color>
-    <color name="text_secondary">#9E9E9E</color>
+    <color name="orange">#FF7A00</color>
+    <color name="orange_light">#FF9A3C</color>
+    <color name="orange_dark">#C85A00</color>
+    <color name="bg">#0B0B0B</color>
+    <color name="surface">#161616</color>
+    <color name="surface2">#1E1E1E</color>
+    <color name="white">#FFFFFF</color>
+    <color name="text2">#A8A8A8</color>
+    <color name="error">#FF5A4E</color>
     <color name="overlay">#99000000</color>
-    <color name="item_focused">#1E88E5</color>
-    <color name="item_pressed">#1565C0</color>
 </resources>

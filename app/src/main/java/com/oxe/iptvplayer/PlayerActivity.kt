@@ -1,5 +1,7 @@
-package com.exemplo.iptvplayer
+package com.oxe.iptvplayer
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -26,7 +28,14 @@ import androidx.media3.ui.PlayerView
 class PlayerActivity : AppCompatActivity() {
 
     companion object {
-        const val EXTRA_INDEX = "index"
+        private const val EXTRA_INDEX = "index"
+        private const val EXTRA_LIVE = "live"
+        private const val STATE_POSITION = "position"
+
+        fun intent(ctx: Context, index: Int, live: Boolean): Intent =
+            Intent(ctx, PlayerActivity::class.java)
+                .putExtra(EXTRA_INDEX, index)
+                .putExtra(EXTRA_LIVE, live)
     }
 
     private lateinit var playerView: PlayerView
@@ -37,20 +46,22 @@ class PlayerActivity : AppCompatActivity() {
 
     private var player: ExoPlayer? = null
     private var index = 0
-    private val playlist get() = ChannelStore.playlist
+    private var live = false
+    private var resumePosition = 0L
+    private val queue get() = Repository.playQueue
 
     private val handler = Handler(Looper.getMainLooper())
     private val hideInfo = Runnable { channelInfo.visibility = View.GONE }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (queue.isEmpty()) {
+            finish()
+            return
+        }
         setContentView(R.layout.activity_player)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         hideSystemUi()
-
-        if (playlist.isEmpty()) {
-            finish(); return
-        }
 
         playerView = findViewById(R.id.player_view)
         channelInfo = findViewById(R.id.channel_info)
@@ -58,23 +69,26 @@ class PlayerActivity : AppCompatActivity() {
         prevButton = findViewById(R.id.prev_button)
         nextButton = findViewById(R.id.next_button)
 
-        index = (savedInstanceState?.getInt(EXTRA_INDEX)
-            ?: intent.getIntExtra(EXTRA_INDEX, 0)).coerceIn(playlist.indices)
+        live = intent.getBooleanExtra(EXTRA_LIVE, false)
+        index = (savedInstanceState?.getInt(EXTRA_INDEX) ?: intent.getIntExtra(EXTRA_INDEX, 0))
+            .coerceIn(queue.indices)
+        resumePosition = savedInstanceState?.getLong(STATE_POSITION) ?: 0L
 
-        // Botões de trocar canal (celular): aparecem junto com os controles
-        prevButton.setOnClickListener { changeChannel(-1) }
-        nextButton.setOnClickListener { changeChannel(+1) }
+        prevButton.setOnClickListener { change(-1) }
+        nextButton.setOnClickListener { change(+1) }
+        val canSwitch = queue.size > 1
         playerView.setControllerVisibilityListener(
             PlayerView.ControllerVisibilityListener { visibility ->
-                prevButton.visibility = visibility
-                nextButton.visibility = visibility
+                val v = if (canSwitch) visibility else View.GONE
+                prevButton.visibility = v
+                nextButton.visibility = v
             }
         )
     }
 
     override fun onStart() {
         super.onStart()
-        if (playlist.isNotEmpty()) initPlayer()
+        if (queue.isNotEmpty() && ::playerView.isInitialized) initPlayer()
     }
 
     override fun onStop() {
@@ -90,14 +104,15 @@ class PlayerActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(EXTRA_INDEX, index)
+        outState.putLong(STATE_POSITION, player?.currentPosition ?: resumePosition)
     }
 
     private fun initPlayer() {
         val http = DefaultHttpDataSource.Factory()
-            .setUserAgent(USER_AGENT)
+            .setUserAgent(Http.USER_AGENT)
             .setAllowCrossProtocolRedirects(true)
             .setConnectTimeoutMs(15_000)
-            .setReadTimeoutMs(15_000)
+            .setReadTimeoutMs(20_000)
 
         val mediaSourceFactory = DefaultMediaSourceFactory(DefaultDataSource.Factory(this, http))
 
@@ -122,54 +137,55 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun releasePlayer() {
+        player?.let { if (!live) resumePosition = it.currentPosition }
         player?.release()
         player = null
         if (::playerView.isInitialized) playerView.player = null
     }
 
     private fun playCurrent() {
-        val channel = playlist[index]
-        val builder = MediaItem.Builder().setUri(channel.url)
-        if (channel.url.lowercase().contains(".m3u8")) {
-            builder.setMimeType(MimeTypes.APPLICATION_M3U8)
-        }
+        val item = queue[index]
+        val builder = MediaItem.Builder().setUri(item.url)
+        if (item.url.lowercase().contains(".m3u8")) builder.setMimeType(MimeTypes.APPLICATION_M3U8)
         errorText.visibility = View.GONE
         player?.run {
-            setMediaItem(builder.build())
+            if (!live && resumePosition > 0) setMediaItem(builder.build(), resumePosition)
+            else setMediaItem(builder.build())
             prepare()
         }
-        showChannelInfo(channel)
+        showInfo(item)
     }
 
-    private fun changeChannel(delta: Int) {
-        if (playlist.isEmpty()) return
-        index = (index + delta + playlist.size) % playlist.size
+    private fun change(delta: Int) {
+        if (queue.size < 2) return
+        index = (index + delta + queue.size) % queue.size
+        resumePosition = 0L
         playCurrent()
     }
 
-    private fun showChannelInfo(channel: Channel) {
-        channelInfo.text = getString(R.string.channel_info, index + 1, channel.name)
+    private fun showInfo(item: PlayItem) {
+        channelInfo.text = if (live) getString(R.string.channel_info, index + 1, item.title) else item.title
         channelInfo.visibility = View.VISIBLE
         handler.removeCallbacks(hideInfo)
         handler.postDelayed(hideInfo, 4_000)
     }
 
-    /** Controle remoto da TV Box: cima/baixo e CH+/CH- trocam de canal. */
+    /** Controle remoto: ▲▼ e CH+/CH- trocam de canal. */
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (event.action == KeyEvent.ACTION_DOWN && ::playerView.isInitialized) {
             val controlsHidden = !playerView.isControllerFullyVisible
             when (event.keyCode) {
                 KeyEvent.KEYCODE_CHANNEL_UP -> {
-                    changeChannel(+1); return true
+                    change(+1); return true
                 }
                 KeyEvent.KEYCODE_CHANNEL_DOWN -> {
-                    changeChannel(-1); return true
+                    change(-1); return true
                 }
-                KeyEvent.KEYCODE_DPAD_UP -> if (controlsHidden) {
-                    changeChannel(+1); return true
+                KeyEvent.KEYCODE_DPAD_UP -> if (live && controlsHidden) {
+                    change(+1); return true
                 }
-                KeyEvent.KEYCODE_DPAD_DOWN -> if (controlsHidden) {
-                    changeChannel(-1); return true
+                KeyEvent.KEYCODE_DPAD_DOWN -> if (live && controlsHidden) {
+                    change(-1); return true
                 }
                 KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> if (controlsHidden) {
                     playerView.showController(); return true

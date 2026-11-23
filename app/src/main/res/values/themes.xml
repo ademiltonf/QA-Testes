@@ -1,9 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.IPTV" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
-        <item name="android:windowBackground">@color/background</item>
+    <style name="Theme.Oxe" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/orange</item>
+        <item name="colorPrimaryDark">@color/bg</item>
+        <item name="colorAccent">@color/orange</item>
+        <item name="colorControlNormal">@color/text2</item>
+        <item name="colorControlActivated">@color/orange</item>
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/text2</item>
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+    </style>
+
+    <style name="OxeInput" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">52dp</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:background">@drawable/input_bg</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorHint">@color/text2</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="OxeButton" parent="">
+        <item name="android:background">@drawable/btn_primary</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:paddingLeft">24dp</item>
+        <item name="android:paddingRight">24dp</item>
+        <item name="android:focusable">true</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="OxeButtonSecondary" parent="OxeButton">
+        <item name="android:background">@drawable/btn_secondary</item>
+    </style>
+
+    <style name="OxeIconButton" parent="">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:background">@drawable/icon_button_bg</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="OxeOptionCard" parent="">
+        <item name="android:layout_width">150dp</item>
+        <item name="android:layout_height">150dp</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/card_bg</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:padding">12dp</item>
+    </style>
+
+    <style name="OxeOptionIcon" parent="">
+        <item name="android:layout_width">64dp</item>
+        <item name="android:layout_height">64dp</item>
+        <item name="android:background">@drawable/circle_orange</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="OxeOptionLabel" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="OxeTile" parent="">
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/tile_bg</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
+    <style name="OxeTileIcon" parent="">
+        <item name="android:layout_width">56dp</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="OxeTileLabel" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="OxeTileCount" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:textColor">#E6FFFFFF</item>
+        <item name="android:textSize">13sp</item>
     </style>
 </resources>
