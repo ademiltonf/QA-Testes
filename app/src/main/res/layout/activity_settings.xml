@@ -196,4 +196,13 @@
         android:layout_weight="1"
         android:clipToPadding="false"
         android:padding="4dp" />
+
+    <TextView
+        android:id="@+id/version_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textColor="#777777"
+        android:textSize="12sp" />
 </LinearLayout>

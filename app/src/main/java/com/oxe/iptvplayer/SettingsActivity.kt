@@ -33,6 +33,9 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<View>(R.id.add_list_button).setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
         }
+        findViewById<TextView>(R.id.version_text).text =
+            "${getString(R.string.app_name)} · versão ${BuildConfigInfo.versionName(this)}"
+
         findViewById<View>(R.id.license_row).apply {
             focusZoom(1.02f)
             setOnClickListener { LicenseActivity.manage(this@SettingsActivity) }

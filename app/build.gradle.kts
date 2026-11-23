@@ -11,8 +11,8 @@ android {
         applicationId = "com.oxe.iptvpro"
         minSdk = 21          // Android 5.0+ (cobre TV Box antigas)
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1 PRO"
+        versionCode = 3
+        versionName = "1.2 PRO"
     }
 
     // Assinatura fixa: as atualizações instalam por cima sem perder nada.
