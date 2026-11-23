@@ -11,7 +11,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /** Configurações: relógio, trocar de lista, adicionar e remover listas. */
 class SettingsActivity : AppCompatActivity() {
@@ -55,6 +59,11 @@ class SettingsActivity : AppCompatActivity() {
         super.onResume()
         reload()
         showLicense()
+        // Consulta o servidor e atualiza o status da licença
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) { runCatching { License.check(this@SettingsActivity) } }
+            showLicense()
+        }
     }
 
     private fun showLicense() {

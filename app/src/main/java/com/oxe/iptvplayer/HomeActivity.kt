@@ -81,6 +81,14 @@ class HomeActivity : AppCompatActivity() {
             finish()
             return
         }
+        // Confere a licença no servidor em segundo plano
+        lifecycleScope.launch {
+            val s = withContext(Dispatchers.IO) { runCatching { License.check(this@HomeActivity) }.getOrNull() }
+            if (s != null && !s.allowed) {
+                LicenseActivity.lock(this@HomeActivity)
+                finish()
+            }
+        }
         findViewById<TextView>(R.id.fav_count)?.text =
             getString(R.string.items_count, FavoritesStore.count(this))
     }

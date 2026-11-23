@@ -11,8 +11,8 @@ android {
         applicationId = "com.oxe.iptvpro"
         minSdk = 21          // Android 5.0+ (cobre TV Box antigas)
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0 PRO"
+        versionCode = 2
+        versionName = "1.1 PRO"
     }
 
     buildTypes {
