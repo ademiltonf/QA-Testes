@@ -87,6 +87,36 @@
     <string name="epg_next">A SEGUIR</string>
     <string name="epg_now_short">Agora: %1$s</string>
 
+    <!-- Licença (PRO) -->
+    <string name="license">Licença</string>
+    <string name="lic_checking">Verificando licença…</string>
+    <string name="lic_device_code">Código do aparelho</string>
+    <string name="lic_choose">Escolha um plano para ativar</string>
+    <string name="lic_trial_over">Seu teste grátis terminou. Escolha um plano para continuar:</string>
+    <string name="lic_blocked">Este aparelho está bloqueado. Fale com o vendedor.</string>
+    <string name="lic_active_lifetime">Licença vitalícia ativa ✔</string>
+    <string name="lic_active_until">Licença ativa até %1$s ✔</string>
+    <string name="lic_plan_year">Anual</string>
+    <string name="lic_plan_lifetime">Vitalício</string>
+    <string name="lic_price_year">R$ 75</string>
+    <string name="lic_price_lifetime">R$ 120</string>
+    <string name="lic_plan_year_desc">1 ano de acesso</string>
+    <string name="lic_plan_lifetime_desc">Pague uma vez e use para sempre</string>
+    <string name="lic_plan_year_full">Plano Anual · R$ 75,00</string>
+    <string name="lic_plan_lifetime_full">Plano Vitalício · R$ 120,00</string>
+    <string name="lic_continue">Continuar usando</string>
+    <string name="lic_scan">Aponte a câmera do celular para o QR Code e pague com Pix ou cartão.</string>
+    <string name="lic_waiting">Aguardando pagamento… a liberação é automática.</string>
+    <string name="lic_check">Já paguei, verificar</string>
+    <string name="lic_not_paid_yet">Pagamento ainda não confirmado. Aguarde alguns segundos.</string>
+    <string name="lic_activated">OXEIPTVPRO ativado! Obrigado 🧡</string>
+    <string name="lic_offline">Sem conexão com o servidor de licenças. %1$s</string>
+    <string name="lic_payment_error">Não foi possível gerar o pagamento. %1$s</string>
+    <plurals name="lic_trial_left">
+        <item quantity="one">Teste grátis: falta %d dia</item>
+        <item quantity="other">Teste grátis: faltam %d dias</item>
+    </plurals>
+
     <!-- Player -->
     <string name="channel_info">%1$d. %2$s</string>
     <string name="play_error">Não foi possível reproduzir (%1$s).</string>

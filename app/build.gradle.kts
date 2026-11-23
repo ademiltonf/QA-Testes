@@ -44,4 +44,7 @@ dependencies {
 
     // Logos e pôsteres
     implementation("io.coil-kt:coil:2.7.0")
+
+    // QR Code do pagamento
+    implementation("com.google.zxing:core:3.5.3")
 }

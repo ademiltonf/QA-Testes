@@ -75,6 +75,12 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        // Teste acabou (ou aparelho bloqueado)? Volta para a tela de ativação.
+        if (!License.allowedOffline(this)) {
+            LicenseActivity.lock(this)
+            finish()
+            return
+        }
         findViewById<TextView>(R.id.fav_count)?.text =
             getString(R.string.items_count, FavoritesStore.count(this))
     }

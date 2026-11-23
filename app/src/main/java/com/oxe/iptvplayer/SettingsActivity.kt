@@ -29,6 +29,11 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<View>(R.id.add_list_button).setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
         }
+        findViewById<View>(R.id.license_row).apply {
+            focusZoom(1.02f)
+            setOnClickListener { LicenseActivity.manage(this@SettingsActivity) }
+        }
+
         val qualityValue = findViewById<TextView>(R.id.quality_value)
         qualityValue.text = Prefs.qualityLabel(this, Prefs.quality(this))
         findViewById<View>(R.id.quality_row).apply {
@@ -49,6 +54,24 @@ class SettingsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         reload()
+        showLicense()
+    }
+
+    private fun showLicense() {
+        findViewById<TextView>(R.id.license_code).text =
+            "${getString(R.string.lic_device_code)}: ${License.deviceId(this)}"
+        val s = License.cached(this)
+        findViewById<TextView>(R.id.license_value).text = when {
+            s == null -> ""
+            s.isPaid && s.plan == "vitalicio" -> getString(R.string.lic_active_lifetime)
+            s.isPaid -> getString(
+                R.string.lic_active_until,
+                java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale("pt", "BR"))
+                    .format(java.util.Date(s.activeUntil ?: 0))
+            )
+            s.allowed -> resources.getQuantityString(R.plurals.lic_trial_left, s.trialDaysLeft, s.trialDaysLeft)
+            else -> getString(R.string.lic_trial_over)
+        }
     }
 
     private fun reload() {
