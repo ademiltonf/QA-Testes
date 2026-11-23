@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">OXEIPTVPLAYER</string>
+    <string name="app_name">OXEIPTVPRO</string>
     <string name="brand_oxe">OXE</string>
-    <string name="brand_rest">IPTVPLAYER</string>
+    <string name="brand_rest">IPTVPRO</string>
 
     <!-- Boas-vindas -->
     <string name="welcome_subtitle">Canais, filmes e séries em um só lugar</string>

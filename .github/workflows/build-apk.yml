@@ -31,9 +31,9 @@ jobs:
             tail -80 build.log
             exit 1
           fi
-          cp app/build/outputs/apk/debug/app-debug.apk OXEIPTVPLAYER.apk
+          cp app/build/outputs/apk/debug/app-debug.apk OXEIPTVPRO.apk
 
       - uses: actions/upload-artifact@v5
         with:
-          name: OXEIPTVPLAYER-apk
-          path: OXEIPTVPLAYER.apk
+          name: OXEIPTVPRO-apk
+          path: OXEIPTVPRO.apk

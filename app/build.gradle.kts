@@ -8,11 +8,11 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.oxe.iptvplayer"
+        applicationId = "com.oxe.iptvpro"
         minSdk = 21          // Android 5.0+ (cobre TV Box antigas)
         targetSdk = 35
-        versionCode = 5
-        versionName = "5.0"
+        versionCode = 1
+        versionName = "1.0 PRO"
     }
 
     buildTypes {
