@@ -50,6 +50,18 @@
                 android:layout_marginTop="6dp"
                 android:textColor="@color/orange_light"
                 android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/fav_button"
+                style="@style/OxeButtonSecondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:drawableStart="@drawable/ic_star_border"
+                android:drawablePadding="8dp"
+                android:minHeight="44dp"
+                android:text="@string/favorite"
+                android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 

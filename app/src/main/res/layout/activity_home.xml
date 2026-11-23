@@ -40,6 +40,50 @@
             android:layout_weight="1" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/fav_bar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/card_bg"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="18dp"
+        android:paddingRight="18dp">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_star" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_weight="1"
+            android:text="@string/my_favorites"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/fav_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/orange_light"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="6dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_chevron" />
+    </LinearLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -60,6 +60,10 @@ class HomeActivity : AppCompatActivity() {
             Repository.refresh()
             loadTiles()
         }
+        findViewById<View>(R.id.fav_bar).apply {
+            focusZoom(1.02f)
+            setOnClickListener { BrowseActivity.startFavorites(this@HomeActivity) }
+        }
         findViewById<View>(R.id.settings_button).setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
@@ -67,6 +71,12 @@ class HomeActivity : AppCompatActivity() {
         loadTiles()
         loadExpiry()
         findViewById<View>(R.id.tile_live).requestFocus()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        findViewById<TextView>(R.id.fav_count)?.text =
+            getString(R.string.items_count, FavoritesStore.count(this))
     }
 
     private fun loadTiles() {

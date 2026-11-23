@@ -25,6 +25,13 @@ class CategoryAdapter(
         notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun select(index: Int) {
+        if (index !in items.indices) return
+        selected = index
+        notifyDataSetChanged()
+    }
+
     class VH(val text: TextView) : RecyclerView.ViewHolder(text)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -56,7 +63,9 @@ class CategoryAdapter(
 /** Grade de canais (logo) ou de filmes/séries (pôster). */
 class EntryAdapter(
     private val type: ContentType,
-    private val onClick: (Int) -> Unit
+    private val isFavorite: (Entry) -> Boolean,
+    private val onClick: (Int) -> Unit,
+    private val onLongClick: (Int) -> Unit
 ) : RecyclerView.Adapter<EntryAdapter.VH>() {
 
     var items: List<Entry> = emptyList()
@@ -71,6 +80,7 @@ class EntryAdapter(
     class VH(view: View) : RecyclerView.ViewHolder(view) {
         val image: ImageView = view.findViewById(R.id.image)
         val title: TextView = view.findViewById(R.id.title)
+        val badge: View = view.findViewById(R.id.fav_badge)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -94,9 +104,15 @@ class EntryAdapter(
             fallback(placeholder)
             crossfade(true)
         }
+        holder.badge.visibility = if (isFavorite(e)) View.VISIBLE else View.GONE
         holder.itemView.setOnClickListener {
             val p = holder.bindingAdapterPosition
             if (p != RecyclerView.NO_POSITION) onClick(p)
+        }
+        holder.itemView.setOnLongClickListener {
+            val p = holder.bindingAdapterPosition
+            if (p != RecyclerView.NO_POSITION) onLongClick(p)
+            true
         }
     }
 }

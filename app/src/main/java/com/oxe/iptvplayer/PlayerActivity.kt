@@ -8,7 +8,9 @@ import android.os.Looper
 import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
+import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -43,6 +45,8 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var errorText: TextView
     private lateinit var prevButton: View
     private lateinit var nextButton: View
+    private lateinit var topActions: View
+    private lateinit var favButton: ImageButton
 
     private var player: ExoPlayer? = null
     private var index = 0
@@ -68,11 +72,16 @@ class PlayerActivity : AppCompatActivity() {
         errorText = findViewById(R.id.error_text)
         prevButton = findViewById(R.id.prev_button)
         nextButton = findViewById(R.id.next_button)
+        topActions = findViewById(R.id.top_actions)
+        favButton = findViewById(R.id.fav_button)
 
         live = intent.getBooleanExtra(EXTRA_LIVE, false)
         index = (savedInstanceState?.getInt(EXTRA_INDEX) ?: intent.getIntExtra(EXTRA_INDEX, 0))
             .coerceIn(queue.indices)
         resumePosition = savedInstanceState?.getLong(STATE_POSITION) ?: 0L
+
+        favButton.setOnClickListener { toggleFavorite() }
+        findViewById<View>(R.id.quality_button).setOnClickListener { chooseQuality() }
 
         prevButton.setOnClickListener { change(-1) }
         nextButton.setOnClickListener { change(+1) }
@@ -82,6 +91,7 @@ class PlayerActivity : AppCompatActivity() {
                 val v = if (canSwitch) visibility else View.GONE
                 prevButton.visibility = v
                 nextButton.visibility = v
+                topActions.visibility = visibility
             }
         )
     }
@@ -121,6 +131,7 @@ class PlayerActivity : AppCompatActivity() {
             .build()
             .also { p ->
                 playerView.player = p
+                applyQuality(p)
                 p.playWhenReady = true
                 p.addListener(object : Player.Listener {
                     override fun onPlayerError(error: PlaybackException) {
@@ -154,6 +165,47 @@ class PlayerActivity : AppCompatActivity() {
             prepare()
         }
         showInfo(item)
+        paintFavorite()
+    }
+
+    private fun paintFavorite() {
+        val entry = queue.getOrNull(index)?.entry
+        favButton.visibility = if (entry != null) View.VISIBLE else View.GONE
+        if (entry != null) {
+            favButton.setImageResource(
+                if (FavoritesStore.isFavorite(this, entry)) R.drawable.ic_star else R.drawable.ic_star_border
+            )
+        }
+    }
+
+    private fun toggleFavorite() {
+        val entry = queue.getOrNull(index)?.entry ?: return
+        val added = FavoritesStore.toggle(this, entry)
+        Toast.makeText(this, if (added) R.string.fav_added else R.string.fav_removed, Toast.LENGTH_SHORT).show()
+        paintFavorite()
+    }
+
+    /** Limita a resolução máxima (útil quando a internet está ruim). */
+    private fun applyQuality(p: ExoPlayer) {
+        val q = Prefs.quality(this)
+        val builder = p.trackSelectionParameters.buildUpon()
+        if (q == 0) builder.clearVideoSizeConstraints()
+        else builder.setMaxVideoSize(q * 16 / 9, q)
+        p.trackSelectionParameters = builder.build()
+    }
+
+    private fun chooseQuality() {
+        val height = player?.videoSize?.height ?: 0
+        val title = if (height > 0) getString(R.string.quality_current, "${height}p")
+        else getString(R.string.quality)
+        Prefs.showQualityDialog(this, title) { q ->
+            player?.let { applyQuality(it) }
+            Toast.makeText(
+                this,
+                getString(R.string.quality_set, Prefs.qualityLabel(this, q)),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     private fun change(delta: Int) {

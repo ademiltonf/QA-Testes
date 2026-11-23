@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -61,6 +63,20 @@ class SeriesActivity : AppCompatActivity() {
                 crossfade(true)
             }
         }
+        val favButton = findViewById<Button>(R.id.fav_button)
+        fun paintFav() {
+            val fav = FavoritesStore.isFavorite(this, series)
+            favButton.setCompoundDrawablesWithIntrinsicBounds(
+                if (fav) R.drawable.ic_star else R.drawable.ic_star_border, 0, 0, 0
+            )
+        }
+        paintFav()
+        favButton.setOnClickListener {
+            val added = FavoritesStore.toggle(this, series)
+            Toast.makeText(this, if (added) R.string.fav_added else R.string.fav_removed, Toast.LENGTH_SHORT).show()
+            paintFav()
+        }
+
         info = findViewById(R.id.series_info)
         progress = findViewById(R.id.progress)
         emptyText = findViewById(R.id.empty_text)

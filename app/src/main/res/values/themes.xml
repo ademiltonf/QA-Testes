@@ -11,6 +11,15 @@
         <item name="android:textColorSecondary">@color/text2</item>
         <item name="android:statusBarColor">@color/bg</item>
         <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="fontFamily">@font/poppins</item>
+        <item name="alertDialogTheme">@style/OxeDialog</item>
+    </style>
+
+    <style name="OxeDialog" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="colorAccent">@color/orange</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="fontFamily">@font/poppins</item>
     </style>
 
     <style name="OxeInput" parent="">

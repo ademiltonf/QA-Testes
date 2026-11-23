@@ -64,6 +64,24 @@
     <string name="season_n">Temporada %1$d</string>
     <string name="episode_n">Episódio %1$d</string>
 
+    <!-- Favoritos -->
+    <string name="my_favorites">Meus favoritos</string>
+    <string name="favorites_chip">★ Favoritos</string>
+    <string name="fav_added">Adicionado aos favoritos ★</string>
+    <string name="fav_removed">Removido dos favoritos</string>
+    <string name="favorite">Favoritar</string>
+    <string name="no_favorites">Nenhum favorito aqui ainda.\nSegure o dedo (ou o botão OK do controle) em um canal, filme ou série para favoritar.</string>
+
+    <!-- Qualidade -->
+    <string name="quality">Qualidade do vídeo</string>
+    <string name="quality_current">Qualidade do vídeo (agora: %1$s)</string>
+    <string name="quality_set">Qualidade: %1$s</string>
+    <string name="q_auto">Automática (melhor possível)</string>
+    <string name="q_1080">1080p · Full HD</string>
+    <string name="q_720">720p · HD</string>
+    <string name="q_480">480p</string>
+    <string name="q_360">360p · internet fraca</string>
+
     <!-- Player -->
     <string name="channel_info">%1$d. %2$s</string>
     <string name="play_error">Não foi possível reproduzir (%1$s).</string>

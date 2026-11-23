@@ -25,7 +25,12 @@ data class Episode(
     val image: String?
 )
 
-data class PlayItem(val title: String, val url: String, val image: String? = null)
+data class PlayItem(
+    val title: String,
+    val url: String,
+    val image: String? = null,
+    val entry: Entry? = null // usado para favoritar dentro do player
+)
 
 data class Account(
     val kind: Kind,

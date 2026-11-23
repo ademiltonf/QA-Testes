@@ -29,6 +29,17 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<View>(R.id.add_list_button).setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
         }
+        val qualityValue = findViewById<TextView>(R.id.quality_value)
+        qualityValue.text = Prefs.qualityLabel(this, Prefs.quality(this))
+        findViewById<View>(R.id.quality_row).apply {
+            focusZoom(1.02f)
+            setOnClickListener {
+                Prefs.showQualityDialog(this@SettingsActivity, getString(R.string.quality)) { q ->
+                    qualityValue.text = Prefs.qualityLabel(this@SettingsActivity, q)
+                }
+            }
+        }
+
         findViewById<RecyclerView>(R.id.account_list).apply {
             layoutManager = LinearLayoutManager(this@SettingsActivity)
             adapter = this@SettingsActivity.adapter
