@@ -24,15 +24,15 @@ android {
         create("player") {
             dimension = "edition"
             applicationId = "com.oxe.iptvplayer"
-            versionCode = 6
-            versionName = "6.0"
+            versionCode = 7
+            versionName = "6.1"
             buildConfigField("boolean", "PRO", "false")
         }
         create("pro") {
             dimension = "edition"
             applicationId = "com.oxe.iptvpro"
-            versionCode = 4
-            versionName = "1.3 PRO"
+            versionCode = 5
+            versionName = "1.4 PRO"
             buildConfigField("boolean", "PRO", "true")
         }
     }
@@ -79,6 +79,7 @@ dependencies {
 
     // Logos e pôsteres
     implementation("io.coil-kt:coil:2.7.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     // QR Code do pagamento
     implementation("com.google.zxing:core:3.5.3")

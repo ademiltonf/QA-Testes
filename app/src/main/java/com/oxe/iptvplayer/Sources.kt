@@ -76,17 +76,17 @@ class XtreamSource(account: Account) : ContentSource {
             when (type) {
                 ContentType.LIVE -> {
                     val id = o.optString("stream_id")
-                    Entry(id, name, o.optString("stream_icon").nullIfBlank(), cat, type,
+                    Entry(id, name, firstImage(o, "stream_icon"), cat, type,
                         "$base/live/$user/$pass/$id.ts")
                 }
                 ContentType.MOVIE -> {
                     val id = o.optString("stream_id")
                     val ext = o.optString("container_extension").nullIfBlank() ?: "mp4"
-                    Entry(id, name, o.optString("stream_icon").nullIfBlank(), cat, type,
+                    Entry(id, name, firstImage(o, "stream_icon", "cover_big", "cover", "movie_image"), cat, type,
                         "$base/movie/$user/$pass/$id.$ext")
                 }
                 ContentType.SERIES ->
-                    Entry(o.optString("series_id"), name, o.optString("cover").nullIfBlank(), cat, type)
+                    Entry(o.optString("series_id"), name, firstImage(o, "cover", "cover_big", "stream_icon", "backdrop_path"), cat, type)
             }
         }
         return Catalog(categories, entries)
@@ -127,7 +127,7 @@ class XtreamSource(account: Account) : ContentSource {
                 val ext = e.optString("container_extension").nullIfBlank() ?: "mp4"
                 val season = e.optInt("season", seasonKey ?: 1)
                 val number = e.optInt("episode_num", out.size + 1)
-                val image = e.optJSONObject("info")?.optString("movie_image").nullIfBlank()
+                val image = e.optJSONObject("info")?.let { firstImage(it, "movie_image", "cover_big") } ?: series.image
                 out += Episode(
                     id = id,
                     title = e.optString("title").nullIfBlank() ?: "Episódio $number",

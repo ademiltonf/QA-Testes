@@ -30,7 +30,7 @@ object M3uParser {
 
                     name = title.ifEmpty { attrs["tvg-name"] ?: "Sem nome" }
                     group = attrs["group-title"]?.takeIf { it.isNotBlank() } ?: NO_GROUP
-                    logo = attrs["tvg-logo"].nullIfBlank()
+                    logo = cleanImageUrl(attrs["tvg-logo"])
                 }
 
                 line.startsWith("#EXTGRP:", ignoreCase = true) ->

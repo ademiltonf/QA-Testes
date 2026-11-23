@@ -59,3 +59,26 @@ fun View.focusZoom(scale: Float = 1.06f) {
 
 fun String?.nullIfBlank(): String? =
     if (this.isNullOrBlank() || this == "null") null else this
+
+/** Arruma links de capa/logo que vêm "quebrados" das listas. */
+fun cleanImageUrl(raw: String?): String? {
+    var s = raw?.trim().nullIfBlank() ?: return null
+    s = s.replace("\\/", "/").replace(" ", "%20")
+    if (s.startsWith("//")) s = "https:$s"
+    if (!s.startsWith("http://", true) && !s.startsWith("https://", true)) return null
+    return s
+}
+
+/** Primeira capa válida entre os campos possíveis do Xtream. */
+fun firstImage(o: org.json.JSONObject, vararg keys: String): String? {
+    for (k in keys) {
+        val v = o.opt(k)
+        val url = when (v) {
+            is String -> cleanImageUrl(v)
+            is org.json.JSONArray -> cleanImageUrl(v.optString(0))
+            else -> null
+        }
+        if (url != null) return url
+    }
+    return null
+}
