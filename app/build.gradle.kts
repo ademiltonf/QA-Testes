@@ -8,11 +8,33 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.oxe.iptvpro"
         minSdk = 21          // Android 5.0+ (cobre TV Box antigas)
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.2 PRO"
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    // Os dois apps saem do mesmo código:
+    //  - player: OXEIPTVPLAYER (gratuito)
+    //  - pro:    OXEIPTVPRO (com ativação paga)
+    flavorDimensions += "edition"
+    productFlavors {
+        create("player") {
+            dimension = "edition"
+            applicationId = "com.oxe.iptvplayer"
+            versionCode = 6
+            versionName = "6.0"
+            buildConfigField("boolean", "PRO", "false")
+        }
+        create("pro") {
+            dimension = "edition"
+            applicationId = "com.oxe.iptvpro"
+            versionCode = 4
+            versionName = "1.3 PRO"
+            buildConfigField("boolean", "PRO", "true")
+        }
     }
 
     // Assinatura fixa: as atualizações instalam por cima sem perder nada.

@@ -13,6 +13,11 @@ import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.graphics.Typeface
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.Color
+import android.os.Build
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -39,6 +44,11 @@ import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.ui.PlayerView
+import androidx.media3.ui.CaptionStyleCompat
+import androidx.media3.ui.SubtitleView
+import androidx.media3.common.C
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 @androidx.annotation.OptIn(UnstableApi::class)
 class PlayerActivity : AppCompatActivity() {
@@ -47,6 +57,18 @@ class PlayerActivity : AppCompatActivity() {
         private const val EXTRA_INDEX = "index"
         private const val EXTRA_LIVE = "live"
         private const val STATE_POSITION = "position"
+        private const val EXTRA_URL = "direct_url"
+        private const val EXTRA_TITLE = "direct_title"
+        private const val EXTRA_IMAGE = "direct_image"
+
+        /** Abre um vídeo direto (lembrete, controle remoto, continuar assistindo). */
+        fun directExtras(url: String, title: String, image: String?, live: Boolean) = Bundle().apply {
+            putString(EXTRA_URL, url)
+            putString(EXTRA_TITLE, title)
+            putString(EXTRA_IMAGE, image)
+            putBoolean(EXTRA_LIVE, live)
+            putInt(EXTRA_INDEX, 0)
+        }
 
         fun intent(ctx: Context, index: Int, live: Boolean): Intent =
             Intent(ctx, PlayerActivity::class.java)
@@ -72,6 +94,8 @@ class PlayerActivity : AppCompatActivity() {
     private var index = 0
     private var live = false
     private var resumePosition = 0L
+    private lateinit var remindButton: Button
+    private var nextProgram: Program? = null
     private val queue get() = Repository.playQueue
 
     private val handler = Handler(Looper.getMainLooper())
@@ -79,6 +103,17 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // PRO: só toca com licença válida
+        if (BuildConfig.PRO && !License.allowedOffline(this)) {
+            LicenseActivity.lock(this)
+            finish()
+            return
+        }
+        intent.getStringExtra(EXTRA_URL)?.let { url ->
+            Repository.playQueue = listOf(
+                PlayItem(intent.getStringExtra(EXTRA_TITLE).orEmpty(), url, intent.getStringExtra(EXTRA_IMAGE))
+            )
+        }
         if (queue.isEmpty()) {
             finish()
             return
@@ -98,6 +133,12 @@ class PlayerActivity : AppCompatActivity() {
         nextButton = findViewById(R.id.next_button)
         topActions = findViewById(R.id.top_actions)
         favButton = findViewById(R.id.fav_button)
+        remindButton = findViewById(R.id.remind_button)
+        remindButton.setOnClickListener { toggleReminder() }
+
+        // Legendas: botão "CC" no player + estilo fácil de ler
+        playerView.setShowSubtitleButton(true)
+        applySubtitleStyle()
 
         live = intent.getBooleanExtra(EXTRA_LIVE, false)
         index = (savedInstanceState?.getInt(EXTRA_INDEX) ?: intent.getIntExtra(EXTRA_INDEX, 0))
@@ -174,13 +215,25 @@ class PlayerActivity : AppCompatActivity() {
 
                     override fun onPlaybackStateChanged(state: Int) {
                         if (state == Player.STATE_READY) errorText.visibility = View.GONE
+                        if (state == Player.STATE_ENDED && !live) {
+                            queue.getOrNull(index)?.let { WatchProgress.remove(this@PlayerActivity, it.url) }
+                        }
                     }
                 })
             }
         playCurrent()
     }
 
+    /** Guarda onde parou (filmes e episódios). */
+    private fun saveProgress() {
+        val p = player ?: return
+        if (live) return
+        val item = queue.getOrNull(index) ?: return
+        WatchProgress.save(this, item, p.currentPosition, p.duration)
+    }
+
     private fun releasePlayer() {
+        saveProgress()
         player?.let { if (!live) resumePosition = it.currentPosition }
         player?.release()
         player = null
@@ -189,6 +242,15 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun playCurrent() {
         val item = queue[index]
+        // Continuar de onde parou
+        if (!live && resumePosition == 0L) {
+            WatchProgress.get(this, item.url)?.let {
+                resumePosition = it.position
+                Toast.makeText(
+                    this, getString(R.string.resume_from, WatchProgress.formatTime(it.position)), Toast.LENGTH_LONG
+                ).show()
+            }
+        }
         val builder = MediaItem.Builder().setUri(item.url)
         if (item.url.lowercase().contains(".m3u8")) builder.setMimeType(MimeTypes.APPLICATION_M3U8)
         errorText.visibility = View.GONE
@@ -224,7 +286,31 @@ class PlayerActivity : AppCompatActivity() {
         val builder = p.trackSelectionParameters.buildUpon()
         if (q == 0) builder.clearVideoSizeConstraints()
         else builder.setMaxVideoSize(q * 16 / 9, q)
+        // Legendas em português quando o vídeo tiver
+        if (Prefs.subtitleMode(this) == 0) {
+            builder.setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
+        } else {
+            builder.setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
+                .setPreferredTextLanguages("pt", "pt-BR", "por")
+                .setSelectUndeterminedTextLanguage(true)
+        }
         p.trackSelectionParameters = builder.build()
+    }
+
+    private fun applySubtitleStyle() {
+        val sub = playerView.subtitleView ?: return
+        sub.setStyle(
+            CaptionStyleCompat(
+                Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT,
+                CaptionStyleCompat.EDGE_TYPE_OUTLINE, Color.BLACK, null
+            )
+        )
+        val scale = when (Prefs.subtitleMode(this)) {
+            2 -> 1.3f
+            3 -> 1.6f
+            else -> 1.0f
+        }
+        sub.setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * scale)
     }
 
     private fun chooseQuality() {
@@ -243,6 +329,7 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun change(delta: Int) {
         if (queue.size < 2) return
+        saveProgress()
         index = (index + delta + queue.size) % queue.size
         resumePosition = 0L
         playCurrent()
@@ -253,6 +340,8 @@ class PlayerActivity : AppCompatActivity() {
         epgNow.visibility = View.GONE
         epgNext.visibility = View.GONE
         epgProgress.visibility = View.GONE
+        remindButton.visibility = View.GONE
+        nextProgram = null
         infoPanel.visibility = View.VISIBLE
         handler.removeCallbacks(hideInfo)
         handler.postDelayed(hideInfo, 5_000)
@@ -280,7 +369,43 @@ class PlayerActivity : AppCompatActivity() {
             if (next != null) {
                 epgNext.text = epgLine(getString(R.string.epg_next), next)
                 epgNext.visibility = View.VISIBLE
+                nextProgram = next
+                paintReminder()
+                remindButton.visibility = View.VISIBLE
             }
+        }
+    }
+
+    private fun paintReminder() {
+        val next = nextProgram ?: return
+        val item = queue.getOrNull(index) ?: return
+        val on = Reminders.find(this, item.url, next.start) != null
+        remindButton.setText(if (on) R.string.reminder_on else R.string.reminder_add)
+    }
+
+    private fun toggleReminder() {
+        val next = nextProgram ?: return
+        val item = queue.getOrNull(index) ?: return
+        val existing = Reminders.find(this, item.url, next.start)
+        if (existing != null) {
+            Reminders.remove(this, existing)
+            Toast.makeText(this, R.string.reminder_removed, Toast.LENGTH_SHORT).show()
+        } else {
+            askNotificationPermission()
+            Reminders.add(this, next, item)
+            Toast.makeText(
+                this, getString(R.string.reminder_added, next.title, timeFormat.format(Date(next.start))),
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        paintReminder()
+    }
+
+    private fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 7)
         }
     }
 

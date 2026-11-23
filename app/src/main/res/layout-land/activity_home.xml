@@ -45,6 +45,30 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/continue_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/continue_watching"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/continue_list"
+            android:layout_width="match_parent"
+            android:layout_height="92dp"
+            android:layout_marginTop="6dp"
+            android:clipToPadding="false" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/fav_bar"
         android:layout_width="match_parent"
         android:layout_height="60dp"

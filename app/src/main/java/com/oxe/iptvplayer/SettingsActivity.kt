@@ -8,22 +8,43 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-/** Configurações: relógio, trocar de lista, adicionar e remover listas. */
+/** Configurações: relógio, licença, reprodução, ferramentas e listas. */
 class SettingsActivity : AppCompatActivity() {
 
     private val adapter = AccountAdapter(
         onUse = { useAccount(it) },
         onDelete = { confirmDelete(it) }
     )
+
+    /** Prepara uma linha de opção (ícone + título) e devolve o campo de valor. */
+    private fun row(id: Int, @DrawableRes icon: Int, @StringRes title: Int, onClick: () -> Unit): TextView {
+        val v = findViewById<View>(id)
+        v.findViewById<ImageView>(R.id.row_icon).setImageResource(icon)
+        v.findViewById<TextView>(R.id.row_title).setText(title)
+        v.focusZoom(1.02f)
+        v.setOnClickListener { onClick() }
+        return v.findViewById(R.id.row_value)
+    }
+
+    private lateinit var licenseValue: TextView
+    private lateinit var remoteValue: TextView
+    private lateinit var remindersValue: TextView
+    private lateinit var autoValue: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,21 +57,39 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.version_text).text =
             "${getString(R.string.app_name)} · versão ${BuildConfigInfo.versionName(this)}"
 
-        findViewById<View>(R.id.license_row).apply {
-            focusZoom(1.02f)
-            setOnClickListener { LicenseActivity.manage(this@SettingsActivity) }
+        // Licença (só no PRO)
+        licenseValue = row(R.id.license_row, R.drawable.ic_check_circle, R.string.license) {
+            LicenseActivity.manage(this)
         }
+        findViewById<View>(R.id.license_row).isVisible = BuildConfig.PRO
 
-        val qualityValue = findViewById<TextView>(R.id.quality_value)
+        // Reprodução
+        val qualityValue = row(R.id.quality_row, R.drawable.ic_hd_orange, R.string.quality) {}
         qualityValue.text = Prefs.qualityLabel(this, Prefs.quality(this))
-        findViewById<View>(R.id.quality_row).apply {
-            focusZoom(1.02f)
-            setOnClickListener {
-                Prefs.showQualityDialog(this@SettingsActivity, getString(R.string.quality)) { q ->
-                    qualityValue.text = Prefs.qualityLabel(this@SettingsActivity, q)
-                }
+        findViewById<View>(R.id.quality_row).setOnClickListener {
+            Prefs.showQualityDialog(this, getString(R.string.quality)) { q ->
+                qualityValue.text = Prefs.qualityLabel(this, q)
             }
         }
+
+        val subsValue = row(R.id.subs_row, R.drawable.ic_subtitles, R.string.subtitles) {}
+        subsValue.text = Prefs.subtitleLabel(this)
+        findViewById<View>(R.id.subs_row).setOnClickListener {
+            Prefs.showSubtitleDialog(this) { subsValue.text = Prefs.subtitleLabel(this) }
+        }
+
+        autoValue = row(R.id.auto_row, R.drawable.ic_sync, R.string.auto_update) {
+            Prefs.showAutoUpdateDialog(this) { showAuto() }
+        }
+
+        // Ferramentas
+        row(R.id.speed_row, R.drawable.ic_speed, R.string.speed_test) {
+            startActivity(Intent(this, SpeedTestActivity::class.java))
+        }.setText(R.string.speed_row_hint)
+        remoteValue = row(R.id.remote_row, R.drawable.ic_phone_remote, R.string.remote) {
+            startActivity(Intent(this, RemoteActivity::class.java))
+        }
+        remindersValue = row(R.id.reminders_row, R.drawable.ic_bell, R.string.reminders) { showReminders() }
 
         findViewById<RecyclerView>(R.id.account_list).apply {
             layoutManager = LinearLayoutManager(this@SettingsActivity)
@@ -61,29 +100,68 @@ class SettingsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         reload()
-        showLicense()
-        // Consulta o servidor e atualiza o status da licença
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) { runCatching { License.check(this@SettingsActivity) } }
+        showAuto()
+        remoteValue.setText(if (RemoteServer.running) R.string.remote_value_on else R.string.remote_value_off)
+        remindersValue.text = getString(R.string.items_count, Reminders.list(this).size)
+        if (BuildConfig.PRO) {
             showLicense()
+            // Consulta o servidor e atualiza o status da licença
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) { runCatching { License.check(this@SettingsActivity) } }
+                showLicense()
+            }
         }
     }
 
+    private fun showAuto() {
+        val last = Prefs.lastRefresh(this)
+        val time = if (last > 0) SimpleDateFormat("HH:mm", Locale("pt", "BR")).format(Date(last)) else "—"
+        autoValue.text = "${Prefs.autoUpdateLabel(this)}\n" + getString(R.string.auto_last, time)
+    }
+
     private fun showLicense() {
-        findViewById<TextView>(R.id.license_code).text =
-            "${getString(R.string.lic_device_code)}: ${License.deviceId(this)}"
+        val sub = findViewById<View>(R.id.license_row).findViewById<TextView>(R.id.row_sub)
+        sub.text = "${getString(R.string.lic_device_code)}: ${License.deviceId(this)}"
+        sub.isVisible = true
         val s = License.cached(this)
-        findViewById<TextView>(R.id.license_value).text = when {
+        licenseValue.text = when {
             s == null -> ""
             s.isPaid && s.plan == "vitalicio" -> getString(R.string.lic_active_lifetime)
             s.isPaid -> getString(
                 R.string.lic_active_until,
-                java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale("pt", "BR"))
-                    .format(java.util.Date(s.activeUntil ?: 0))
+                SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR")).format(Date(s.activeUntil ?: 0))
             )
             s.allowed -> resources.getQuantityString(R.plurals.lic_trial_left, s.trialDaysLeft, s.trialDaysLeft)
             else -> getString(R.string.lic_trial_over)
         }
+    }
+
+    /** Lista de lembretes: tocar em um para cancelar. */
+    private fun showReminders() {
+        val list = Reminders.list(this).sortedBy { it.start }
+        if (list.isEmpty()) {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.reminders)
+                .setMessage(R.string.reminders_empty)
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+            return
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.reminders_tap_cancel)
+            .setItems(list.map { Reminders.describe(it) }.toTypedArray()) { _, which ->
+                val r = list[which]
+                AlertDialog.Builder(this)
+                    .setMessage(getString(R.string.reminder_cancel_confirm, r.program))
+                    .setPositiveButton(R.string.remove) { _, _ ->
+                        Reminders.remove(this, r)
+                        remindersValue.text = getString(R.string.items_count, Reminders.list(this).size)
+                    }
+                    .setNegativeButton(R.string.cancel, null)
+                    .show()
+            }
+            .setNegativeButton(R.string.back, null)
+            .show()
     }
 
     private fun reload() {

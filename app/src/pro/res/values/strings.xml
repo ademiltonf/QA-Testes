@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos que mudam só no OXEIPTVPRO -->
+<resources>
+    <string name="app_name">OXEIPTVPRO</string>
+    <string name="brand_rest">IPTVPRO</string>
+</resources>

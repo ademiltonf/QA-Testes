@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "OXEIPTVPRO"
+rootProject.name = "OXEAPPS"
 include(":app")

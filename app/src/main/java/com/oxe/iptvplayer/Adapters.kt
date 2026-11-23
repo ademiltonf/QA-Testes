@@ -178,3 +178,52 @@ class EpisodeAdapter(
         }
     }
 }
+
+/** Fileira "Continuar assistindo" da tela inicial. */
+class ContinueAdapter(
+    private val onClick: (WatchProgress.Item) -> Unit,
+    private val onLongClick: (WatchProgress.Item) -> Unit
+) : RecyclerView.Adapter<ContinueAdapter.VH>() {
+
+    private var items: List<WatchProgress.Item> = emptyList()
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun submit(list: List<WatchProgress.Item>) {
+        items = list
+        notifyDataSetChanged()
+    }
+
+    class VH(view: View) : RecyclerView.ViewHolder(view) {
+        val image: ImageView = view.findViewById(R.id.image)
+        val title: TextView = view.findViewById(R.id.title)
+        val time: TextView = view.findViewById(R.id.time)
+        val progress: android.widget.ProgressBar = view.findViewById(R.id.progress)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_continue, parent, false)
+        view.focusZoom(1.05f)
+        return VH(view).also { it.image.clipToOutline = true }
+    }
+
+    override fun getItemCount(): Int = items.size
+
+    override fun onBindViewHolder(holder: VH, position: Int) {
+        val it = items[position]
+        holder.title.text = it.title
+        holder.time.text = "${WatchProgress.formatTime(it.position)} / ${WatchProgress.formatTime(it.duration)}"
+        holder.progress.progress = it.percent
+        holder.image.load(it.image) {
+            placeholder(R.drawable.ph_poster)
+            error(R.drawable.ph_poster)
+            fallback(R.drawable.ph_poster)
+        }
+        holder.itemView.setOnClickListener { _ ->
+            items.getOrNull(holder.bindingAdapterPosition)?.let(onClick)
+        }
+        holder.itemView.setOnLongClickListener { _ ->
+            items.getOrNull(holder.bindingAdapterPosition)?.let(onLongClick)
+            true
+        }
+    }
+}

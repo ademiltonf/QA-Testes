@@ -36,13 +36,19 @@ jobs:
         env:
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         run: |
-          if ! gradle assembleRelease --no-daemon > build.log 2>&1; then
+          if ! gradle assemblePlayerRelease assembleProRelease --no-daemon > build.log 2>&1; then
             msg=$(grep -E "^e: |error:|ERROR|What went wrong|^> " build.log | head -40 | sed ':a;N;$!ba;s/\n/%0A/g')
             echo "::error title=Falha na compilação::$msg"
             tail -80 build.log
             exit 1
           fi
-          cp app/build/outputs/apk/release/app-release.apk OXEIPTVPRO.apk
+          cp app/build/outputs/apk/player/release/app-player-release.apk OXEIPTVPLAYER.apk
+          cp app/build/outputs/apk/pro/release/app-pro-release.apk OXEIPTVPRO.apk
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: OXEIPTVPLAYER-apk
+          path: OXEIPTVPLAYER.apk
 
       - uses: actions/upload-artifact@v5
         with:

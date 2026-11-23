@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">OXEIPTVPRO</string>
+    <string name="app_name">OXEIPTVPLAYER</string>
     <string name="brand_oxe">OXE</string>
-    <string name="brand_rest">IPTVPRO</string>
+    <string name="brand_rest">IPTVPLAYER</string>
 
     <!-- Boas-vindas -->
     <string name="welcome_subtitle">Canais, filmes e séries em um só lugar</string>
@@ -116,6 +116,74 @@
         <item quantity="one">Teste grátis: falta %d dia</item>
         <item quantity="other">Teste grátis: faltam %d dias</item>
     </plurals>
+
+    <!-- Continuar assistindo -->
+    <string name="continue_watching">Continuar assistindo</string>
+    <string name="continue_removed">Removido de \"Continuar assistindo\"</string>
+    <string name="resume_from">Continuando de %1$s</string>
+
+    <!-- Seções das Configurações -->
+    <string name="section_playback">Reprodução</string>
+    <string name="section_tools">Ferramentas</string>
+
+    <!-- Legendas -->
+    <string name="subtitles">Legendas</string>
+    <string name="subs_off">Desligadas</string>
+    <string name="subs_normal">Português · tamanho normal</string>
+    <string name="subs_large">Português · grande</string>
+    <string name="subs_xlarge">Português · extra grande</string>
+
+    <!-- Atualização automática -->
+    <string name="auto_update">Atualização automática</string>
+    <string name="auto_off">Desligada</string>
+    <string name="auto_3h">A cada 3 horas</string>
+    <string name="auto_6h">A cada 6 horas</string>
+    <string name="auto_12h">A cada 12 horas</string>
+    <string name="auto_24h">Uma vez por dia</string>
+    <string name="auto_last">Última: %1$s</string>
+    <string name="auto_updated">Listas e programação atualizadas ✔</string>
+
+    <!-- Teste de velocidade -->
+    <string name="speed_test">Teste de velocidade</string>
+    <string name="speed_row_hint">Medir minha internet</string>
+    <string name="speed_ready">Toque em iniciar para medir sua internet</string>
+    <string name="speed_start">Iniciar teste</string>
+    <string name="speed_again">Testar de novo</string>
+    <string name="speed_ping">Ping</string>
+    <string name="speed_download">Download</string>
+    <string name="speed_upload">Upload</string>
+    <string name="speed_done">Resultado (download)</string>
+    <string name="speed_mbps">%1$.1f Mbps</string>
+    <string name="speed_ms">%1$d ms</string>
+    <string name="speed_error">Não foi possível testar: %1$s</string>
+    <string name="speed_advice_low">Internet fraca para vídeo. Use a qualidade 480p ou 360p nas Configurações.</string>
+    <string name="speed_advice_720">Boa para 720p (HD). Em 1080p pode travar às vezes.</string>
+    <string name="speed_advice_1080">Ótima para 1080p (Full HD).</string>
+    <string name="speed_advice_great">Excelente! Assiste em Full HD e até 4K sem travar. 🚀</string>
+    <string name="speed_note">Dica: no Wi-Fi, fique perto do roteador. Para TV Box, o cabo de rede é o mais estável.</string>
+
+    <!-- Lembretes -->
+    <string name="reminders">Lembretes</string>
+    <string name="reminder_add">🔔 Lembrar do próximo</string>
+    <string name="reminder_on">🔔 Lembrete ativo (tocar para cancelar)</string>
+    <string name="reminder_added">Vou te avisar 5 min antes de \"%1$s\" (%2$s)</string>
+    <string name="reminder_removed">Lembrete cancelado</string>
+    <string name="reminder_title">%1$s vai começar!</string>
+    <string name="reminder_text">Em 5 minutos no canal %1$s. Toque para assistir.</string>
+    <string name="reminders_empty">Nenhum lembrete. Ao assistir um canal, aperte OK e toque em \"Lembrar do próximo\".</string>
+    <string name="reminders_tap_cancel">Lembretes (toque para cancelar)</string>
+    <string name="reminder_cancel_confirm">Cancelar o lembrete de \"%1$s\"?</string>
+
+    <!-- Controle pelo celular -->
+    <string name="remote">Controle pelo celular</string>
+    <string name="remote_value_on">Ligado</string>
+    <string name="remote_value_off">Desligado</string>
+    <string name="remote_on">Aponte a câmera do celular para o QR Code. O celular precisa estar no mesmo Wi-Fi da TV.</string>
+    <string name="remote_off">O controle pelo celular está desligado.</string>
+    <string name="remote_no_wifi">A TV não está conectada a uma rede Wi-Fi ou cabo. Conecte e abra esta tela de novo.</string>
+    <string name="remote_help">No celular você terá setas, OK, voltar, play/pause, troca de canal, volume e um campo para digitar na TV (ótimo para colocar links e senhas).</string>
+    <string name="remote_turn_off">Desligar controle</string>
+    <string name="remote_turn_on">Ligar controle</string>
 
     <!-- Player -->
     <string name="channel_info">%1$d. %2$s</string>

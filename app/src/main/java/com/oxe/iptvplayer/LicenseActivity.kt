@@ -59,6 +59,12 @@ class LicenseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         manage = intent.getBooleanExtra(EXTRA_MANAGE, false)
 
+        // OXEIPTVPLAYER (gratuito) não tem ativação
+        if (!BuildConfig.PRO) {
+            proceed()
+            return
+        }
+
         // Já liberado (verificado há pouco)? Entra direto e confere em segundo plano.
         if (!manage && License.allowedOffline(this)) {
             lifecycleScope.launch(Dispatchers.IO) { runCatching { License.check(applicationContext) } }

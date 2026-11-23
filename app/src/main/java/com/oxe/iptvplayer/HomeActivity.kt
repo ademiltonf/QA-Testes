@@ -10,6 +10,11 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
 import coil.load
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,6 +35,27 @@ class HomeActivity : AppCompatActivity() {
         Tile(ContentType.MOVIE, R.id.tile_movies, R.string.movies, R.drawable.ic_movie, R.drawable.art_movies),
         Tile(ContentType.SERIES, R.id.tile_series, R.string.series, R.drawable.ic_series, R.drawable.art_series)
     )
+
+    private val continueAdapter = ContinueAdapter(
+        onClick = { item ->
+            Repository.playQueue = listOf(PlayItem(item.title, item.url, item.image))
+            startActivity(PlayerActivity.intent(this, 0, live = false))
+        },
+        onLongClick = { item ->
+            WatchProgress.remove(this, item.url)
+            Toast.makeText(this, R.string.continue_removed, Toast.LENGTH_SHORT).show()
+            showContinue()
+        }
+    )
+
+    // Confere de 30 em 30 minutos se está na hora de atualizar sozinho
+    private val autoHandler = Handler(Looper.getMainLooper())
+    private val autoCheck = object : Runnable {
+        override fun run() {
+            autoRefreshIfDue()
+            autoHandler.postDelayed(this, 30 * 60_000L)
+        }
+    }
 
     private val posterIds = listOf(
         R.id.poster1, R.id.poster2, R.id.poster3, R.id.poster4, R.id.poster5, R.id.poster6
@@ -68,29 +94,60 @@ class HomeActivity : AppCompatActivity() {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
+        findViewById<RecyclerView>(R.id.continue_list).apply {
+            layoutManager = LinearLayoutManager(this@HomeActivity, RecyclerView.HORIZONTAL, false)
+            adapter = continueAdapter
+        }
+
         loadTiles()
+        Prefs.markRefreshed(this)
         loadExpiry()
         findViewById<View>(R.id.tile_live).requestFocus()
     }
 
     override fun onResume() {
         super.onResume()
-        // Teste acabou (ou aparelho bloqueado)? Volta para a tela de ativação.
-        if (!License.allowedOffline(this)) {
-            LicenseActivity.lock(this)
-            finish()
-            return
-        }
-        // Confere a licença no servidor em segundo plano
-        lifecycleScope.launch {
-            val s = withContext(Dispatchers.IO) { runCatching { License.check(this@HomeActivity) }.getOrNull() }
-            if (s != null && !s.allowed) {
-                LicenseActivity.lock(this@HomeActivity)
+        if (BuildConfig.PRO) {
+            // Teste acabou (ou aparelho bloqueado)? Volta para a tela de ativação.
+            if (!License.allowedOffline(this)) {
+                LicenseActivity.lock(this)
                 finish()
+                return
+            }
+            // Confere a licença no servidor em segundo plano
+            lifecycleScope.launch {
+                val s = withContext(Dispatchers.IO) { runCatching { License.check(this@HomeActivity) }.getOrNull() }
+                if (s != null && !s.allowed) {
+                    LicenseActivity.lock(this@HomeActivity)
+                    finish()
+                }
             }
         }
+        showContinue()
+        autoHandler.removeCallbacks(autoCheck)
+        autoHandler.post(autoCheck)
         findViewById<TextView>(R.id.fav_count)?.text =
             getString(R.string.items_count, FavoritesStore.count(this))
+    }
+
+    override fun onPause() {
+        super.onPause()
+        autoHandler.removeCallbacks(autoCheck)
+    }
+
+    private fun showContinue() {
+        val list = WatchProgress.list(this)
+        continueAdapter.submit(list)
+        findViewById<View>(R.id.continue_section)?.isVisible = list.isNotEmpty()
+    }
+
+    /** Atualização automática de listas, categorias e programação. */
+    private fun autoRefreshIfDue() {
+        if (!Prefs.refreshDue(this)) return
+        Repository.refresh()
+        Prefs.markRefreshed(this)
+        loadTiles()
+        Toast.makeText(this, R.string.auto_updated, Toast.LENGTH_SHORT).show()
     }
 
     private fun loadTiles() {
