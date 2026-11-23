@@ -21,13 +21,13 @@ object Repository {
     /** Reabre a última lista salva, se o app foi fechado. */
     fun ensure(ctx: Context): Boolean {
         if (source != null) return true
-        val acc = AccountStore.load(ctx) ?: return false
+        val acc = AccountStore.active(ctx) ?: return false
         open(ctx, acc)
         return true
     }
 
     fun open(ctx: Context, acc: Account) {
-        val file = AccountStore.playlistFile(ctx.applicationContext)
+        val file = AccountStore.playlistFile(ctx.applicationContext, acc.id)
         account = acc
         expiry = null
         synchronized(cache) { cache.clear() }

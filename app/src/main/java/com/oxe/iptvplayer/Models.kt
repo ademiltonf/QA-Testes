@@ -33,7 +33,8 @@ data class Account(
     val server: String = "",
     val username: String = "",
     val password: String = "",
-    val url: String = ""
+    val url: String = "",
+    val id: String = java.util.UUID.randomUUID().toString()
 ) {
     enum class Kind { XTREAM, M3U_URL, M3U_FILE }
 }

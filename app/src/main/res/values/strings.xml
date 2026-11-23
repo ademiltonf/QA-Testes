@@ -4,6 +4,22 @@
     <string name="brand_oxe">OXE</string>
     <string name="brand_rest">IPTVPLAYER</string>
 
+    <!-- Boas-vindas -->
+    <string name="welcome_subtitle">Canais, filmes e séries em um só lugar</string>
+    <string name="add_iptv">ADICIONAR IPTV</string>
+
+    <!-- Configurações -->
+    <string name="settings">Configurações</string>
+    <string name="my_lists">Minhas listas</string>
+    <string name="add_list">Adicionar nova lista</string>
+    <string name="in_use">Em uso</string>
+    <string name="tap_to_use">Toque para usar</string>
+    <string name="remove">Remover</string>
+    <string name="remove_confirm">Remover a lista \"%1$s\" do aplicativo?</string>
+    <string name="kind_xtream">Xtream Codes</string>
+    <string name="kind_m3u">Lista M3U</string>
+    <string name="kind_file">Arquivo M3U</string>
+
     <!-- Login -->
     <string name="login_subtitle">Escolha como você quer entrar</string>
     <string name="opt_xtream">Xtream Codes</string>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Em TVs e tablets o formulário fica centralizado -->
+    <!-- Em TVs e tablets o conteúdo fica centralizado -->
     <dimen name="form_side">180dp</dimen>
+    <dimen name="screen_side">120dp</dimen>
 </resources>

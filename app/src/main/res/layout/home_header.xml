@@ -6,8 +6,8 @@
     android:orientation="horizontal">
 
     <ImageView
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
         android:contentDescription="@string/app_name"
         android:src="@drawable/logo_cactus" />
 
@@ -58,6 +58,37 @@
             android:visibility="gone" />
     </LinearLayout>
 
+    <!-- Relógio -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
+        android:background="@drawable/clock_bg"
+        android:gravity="end"
+        android:orientation="vertical"
+        android:paddingLeft="14dp"
+        android:paddingTop="6dp"
+        android:paddingRight="14dp"
+        android:paddingBottom="6dp">
+
+        <TextClock
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:format12Hour="HH:mm"
+            android:format24Hour="HH:mm"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextClock
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:format12Hour="EEE, dd/MM"
+            android:format24Hour="EEE, dd/MM"
+            android:textColor="@color/text2"
+            android:textSize="11sp" />
+    </LinearLayout>
+
     <ImageButton
         android:id="@+id/refresh_button"
         style="@style/OxeIconButton"
@@ -65,8 +96,8 @@
         android:src="@drawable/ic_refresh" />
 
     <ImageButton
-        android:id="@+id/logout_button"
+        android:id="@+id/settings_button"
         style="@style/OxeIconButton"
-        android:contentDescription="@string/logout"
-        android:src="@drawable/ic_logout" />
+        android:contentDescription="@string/settings"
+        android:src="@drawable/ic_settings" />
 </LinearLayout>

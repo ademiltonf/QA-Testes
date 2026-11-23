@@ -45,12 +45,6 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Já tem lista salva? Vai direto para o início.
-        if (Repository.ensure(this)) {
-            goHome()
-            return
-        }
-
         setContentView(R.layout.activity_login)
         options = findViewById(R.id.options)
         form = findViewById(R.id.form)
@@ -177,10 +171,13 @@ class LoginActivity : AppCompatActivity() {
                     Repository.open(this@LoginActivity, acc)
                     Repository.validate()
                 }
-                AccountStore.save(this@LoginActivity, acc)
+                AccountStore.add(this@LoginActivity, acc)
                 goHome()
             } catch (e: Exception) {
                 Repository.close()
+                if (acc.kind == Account.Kind.M3U_FILE) {
+                    AccountStore.playlistFile(this@LoginActivity, acc.id).delete()
+                }
                 setLoading(false)
                 showError(e.message ?: e.javaClass.simpleName)
             }
@@ -191,16 +188,17 @@ class LoginActivity : AppCompatActivity() {
         setLoading(true)
         lifecycleScope.launch {
             try {
+                val acc = Account(Account.Kind.M3U_FILE, getString(R.string.local_file))
                 withContext(Dispatchers.IO) {
                     val input = contentResolver.openInputStream(uri)
                         ?: throw IOException(getString(R.string.file_error))
                     input.use { inp ->
-                        AccountStore.playlistFile(this@LoginActivity).outputStream().use { out ->
+                        AccountStore.playlistFile(this@LoginActivity, acc.id).outputStream().use { out ->
                             inp.copyTo(out)
                         }
                     }
                 }
-                connect(Account(Account.Kind.M3U_FILE, getString(R.string.local_file)))
+                connect(acc)
             } catch (e: Exception) {
                 setLoading(false)
                 showError(e.message ?: getString(R.string.file_error))
@@ -220,7 +218,9 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun goHome() {
-        startActivity(Intent(this, HomeActivity::class.java))
-        finish()
+        startActivity(
+            Intent(this, HomeActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        )
     }
 }
