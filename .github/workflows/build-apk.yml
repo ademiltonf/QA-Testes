@@ -23,15 +23,26 @@ jobs:
         with:
           gradle-version: "8.9"
 
-      - name: Compilar APK
+      - name: Conferir senha da assinatura
+        env:
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         run: |
-          if ! gradle assembleDebug --no-daemon > build.log 2>&1; then
+          if [ -z "$SIGNING_PASSWORD" ]; then
+            echo "::error title=Falta a senha::Crie o segredo SIGNING_PASSWORD em Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+
+      - name: Compilar APK
+        env:
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        run: |
+          if ! gradle assembleRelease --no-daemon > build.log 2>&1; then
             msg=$(grep -E "^e: |error:|ERROR|What went wrong|^> " build.log | head -40 | sed ':a;N;$!ba;s/\n/%0A/g')
             echo "::error title=Falha na compilação::$msg"
             tail -80 build.log
             exit 1
           fi
-          cp app/build/outputs/apk/debug/app-debug.apk OXEIPTVPRO.apk
+          cp app/build/outputs/apk/release/app-release.apk OXEIPTVPRO.apk
 
       - uses: actions/upload-artifact@v5
         with:

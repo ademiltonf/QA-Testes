@@ -15,9 +15,22 @@ android {
         versionName = "1.1 PRO"
     }
 
+    // Assinatura fixa: as atualizações instalam por cima sem perder nada.
+    // A senha fica no segredo SIGNING_PASSWORD do GitHub (nunca no código).
+    val signingPassword = System.getenv("SIGNING_PASSWORD")
+    signingConfigs {
+        create("oxe") {
+            storeFile = rootProject.file("keystore/oxe-release.jks")
+            storePassword = signingPassword
+            keyAlias = "oxe"
+            keyPassword = signingPassword
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            if (!signingPassword.isNullOrEmpty()) signingConfig = signingConfigs.getByName("oxe")
         }
     }
 
