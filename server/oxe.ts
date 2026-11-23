@@ -114,7 +114,7 @@ async function webhook(req: Request) {
     return json({ error: "unauthorized" }, 401);
   }
   const ev = await req.json().catch(() => ({}));
-  if (!["PAYMENT_RECEIVED", "PAYMENT_CONFIRMED"].includes(ev?.event)) return json({ ok: true });
+  if (!["PAYMENT_RECEIVED", "PAYMENT_CONFIRMED", "PAYMENT_RECEIVED_IN_CASH"].includes(ev?.event)) return json({ ok: true });
   const p = ev.payment ?? {};
 
   // Descobre de qual aparelho é o pagamento
