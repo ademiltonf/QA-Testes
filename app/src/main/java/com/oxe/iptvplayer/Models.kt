@@ -25,6 +25,9 @@ data class Episode(
     val image: String?
 )
 
+/** Um programa da grade (EPG). Horários em milissegundos. */
+data class Program(val title: String, val start: Long, val end: Long)
+
 data class PlayItem(
     val title: String,
     val url: String,

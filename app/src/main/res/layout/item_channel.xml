@@ -54,4 +54,18 @@
         android:textColor="@color/white"
         android:textSize="13sp"
         android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/epg_now"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:paddingBottom="2dp"
+        android:textColor="@color/orange_light"
+        android:textSize="11sp"
+        android:visibility="gone" />
 </LinearLayout>

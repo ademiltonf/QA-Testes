@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 
 /**
@@ -51,6 +53,7 @@ class BrowseActivity : AppCompatActivity() {
     private lateinit var entryAdapter: EntryAdapter
 
     private var catalog: Catalog? = null
+    private val epgLimit = Semaphore(4)
     private var selectedCategory: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -126,7 +129,8 @@ class BrowseActivity : AppCompatActivity() {
             type,
             isFavorite = { FavoritesStore.isFavorite(this, it) },
             onClick = { open(it) },
-            onLongClick = { toggleFavorite(it) }
+            onLongClick = { toggleFavorite(it) },
+            epgLoader = if (type == ContentType.LIVE && Repository.supportsEpg) ::loadNowPlaying else null
         )
         grid.layoutManager = GridLayoutManager(this, spans)
         grid.adapter = entryAdapter
@@ -185,6 +189,14 @@ class BrowseActivity : AppCompatActivity() {
         )
         emptyText.isVisible = list.isEmpty()
     }
+
+    private fun loadNowPlaying(entry: Entry, done: (String?) -> Unit) =
+        lifecycleScope.launch {
+            val now = epgLimit.withPermit {
+                withContext(Dispatchers.IO) { Repository.nowAndNext(entry).first }
+            }
+            done(now?.let { getString(R.string.epg_now_short, it.title) })
+        }
 
     private fun toggleFavorite(position: Int) {
         val e = entryAdapter.items.getOrNull(position) ?: return

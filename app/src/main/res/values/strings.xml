@@ -82,6 +82,11 @@
     <string name="q_480">480p</string>
     <string name="q_360">360p · internet fraca</string>
 
+    <!-- Programação -->
+    <string name="epg_now">AGORA</string>
+    <string name="epg_next">A SEGUIR</string>
+    <string name="epg_now_short">Agora: %1$s</string>
+
     <!-- Player -->
     <string name="channel_info">%1$d. %2$s</string>
     <string name="play_error">Não foi possível reproduzir (%1$s).</string>

@@ -8,11 +8,25 @@ import android.os.Looper
 import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
+import android.graphics.Typeface
 import android.widget.ImageButton
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.media3.common.MediaItem
@@ -42,6 +56,12 @@ class PlayerActivity : AppCompatActivity() {
 
     private lateinit var playerView: PlayerView
     private lateinit var channelInfo: TextView
+    private lateinit var infoPanel: View
+    private lateinit var epgNow: TextView
+    private lateinit var epgNext: TextView
+    private lateinit var epgProgress: ProgressBar
+    private var epgJob: Job? = null
+    private val timeFormat = SimpleDateFormat("HH:mm", Locale("pt", "BR"))
     private lateinit var errorText: TextView
     private lateinit var prevButton: View
     private lateinit var nextButton: View
@@ -55,7 +75,7 @@ class PlayerActivity : AppCompatActivity() {
     private val queue get() = Repository.playQueue
 
     private val handler = Handler(Looper.getMainLooper())
-    private val hideInfo = Runnable { channelInfo.visibility = View.GONE }
+    private val hideInfo = Runnable { infoPanel.visibility = View.GONE }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +89,10 @@ class PlayerActivity : AppCompatActivity() {
 
         playerView = findViewById(R.id.player_view)
         channelInfo = findViewById(R.id.channel_info)
+        infoPanel = findViewById(R.id.info_panel)
+        epgNow = findViewById(R.id.epg_now)
+        epgNext = findViewById(R.id.epg_next)
+        epgProgress = findViewById(R.id.epg_progress)
         errorText = findViewById(R.id.error_text)
         prevButton = findViewById(R.id.prev_button)
         nextButton = findViewById(R.id.next_button)
@@ -92,6 +116,15 @@ class PlayerActivity : AppCompatActivity() {
                 prevButton.visibility = v
                 nextButton.visibility = v
                 topActions.visibility = visibility
+                // Ao pausar / apertar OK: mostra o título e a programação
+                if (visibility == View.VISIBLE) {
+                    handler.removeCallbacks(hideInfo)
+                    infoPanel.visibility = View.VISIBLE
+                    loadEpg()
+                } else {
+                    handler.removeCallbacks(hideInfo)
+                    handler.postDelayed(hideInfo, 300)
+                }
             }
         )
     }
@@ -217,9 +250,51 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun showInfo(item: PlayItem) {
         channelInfo.text = if (live) getString(R.string.channel_info, index + 1, item.title) else item.title
-        channelInfo.visibility = View.VISIBLE
+        epgNow.visibility = View.GONE
+        epgNext.visibility = View.GONE
+        epgProgress.visibility = View.GONE
+        infoPanel.visibility = View.VISIBLE
         handler.removeCallbacks(hideInfo)
-        handler.postDelayed(hideInfo, 4_000)
+        handler.postDelayed(hideInfo, 5_000)
+        loadEpg()
+    }
+
+    /** Busca o programa de agora e o próximo (canais ao vivo). */
+    private fun loadEpg() {
+        val entry = queue.getOrNull(index)?.entry ?: return
+        if (!live || !Repository.supportsEpg) return
+        epgJob?.cancel()
+        epgJob = lifecycleScope.launch {
+            val (now, next) = withContext(Dispatchers.IO) {
+                runCatching { Repository.nowAndNext(entry) }.getOrDefault(null to null)
+            }
+            if (queue.getOrNull(index)?.entry?.id != entry.id) return@launch
+            if (now != null) {
+                epgNow.text = epgLine(getString(R.string.epg_now), now)
+                epgNow.visibility = View.VISIBLE
+                val total = (now.end - now.start).coerceAtLeast(1)
+                val done = System.currentTimeMillis() - now.start
+                epgProgress.progress = (done * 1000 / total).toInt().coerceIn(0, 1000)
+                epgProgress.visibility = View.VISIBLE
+            }
+            if (next != null) {
+                epgNext.text = epgLine(getString(R.string.epg_next), next)
+                epgNext.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun epgLine(label: String, p: Program): CharSequence {
+        val sb = SpannableStringBuilder()
+        val start = sb.length
+        sb.append(label)
+        sb.setSpan(ForegroundColorSpan(0xFFFF7A00.toInt()), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.setSpan(StyleSpan(Typeface.BOLD), start, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        val t0 = sb.length
+        sb.append("  ").append(timeFormat.format(Date(p.start))).append(" – ").append(timeFormat.format(Date(p.end)))
+        sb.setSpan(ForegroundColorSpan(0xFFA8A8A8.toInt()), t0, sb.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.append("   ").append(p.title)
+        return sb
     }
 
     /** Controle remoto: ▲▼ e CH+/CH- trocam de canal. */

@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import kotlinx.coroutines.Job
 
 /** Lista de categorias (ou temporadas) em formato de "chips". */
 class CategoryAdapter(
@@ -65,7 +66,9 @@ class EntryAdapter(
     private val type: ContentType,
     private val isFavorite: (Entry) -> Boolean,
     private val onClick: (Int) -> Unit,
-    private val onLongClick: (Int) -> Unit
+    private val onLongClick: (Int) -> Unit,
+    /** Busca "o que está passando agora" de um canal (só canais ao vivo). */
+    private val epgLoader: ((Entry, (String?) -> Unit) -> Job?)? = null
 ) : RecyclerView.Adapter<EntryAdapter.VH>() {
 
     var items: List<Entry> = emptyList()
@@ -81,6 +84,8 @@ class EntryAdapter(
         val image: ImageView = view.findViewById(R.id.image)
         val title: TextView = view.findViewById(R.id.title)
         val badge: View = view.findViewById(R.id.fav_badge)
+        val epgNow: TextView? = view.findViewById(R.id.epg_now)
+        var epgJob: Job? = null
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -105,6 +110,17 @@ class EntryAdapter(
             crossfade(true)
         }
         holder.badge.visibility = if (isFavorite(e)) View.VISIBLE else View.GONE
+        holder.epgJob?.cancel()
+        holder.epgNow?.let { epgView ->
+            epgView.visibility = View.GONE
+            epgView.tag = e.id
+            holder.epgJob = epgLoader?.invoke(e) { text ->
+                if (epgView.tag == e.id && !text.isNullOrBlank()) {
+                    epgView.text = text
+                    epgView.visibility = View.VISIBLE
+                }
+            }
+        }
         holder.itemView.setOnClickListener {
             val p = holder.bindingAdapterPosition
             if (p != RecyclerView.NO_POSITION) onClick(p)

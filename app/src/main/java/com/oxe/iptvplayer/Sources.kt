@@ -1,5 +1,6 @@
 package com.oxe.iptvplayer
 
+import android.util.Base64
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
@@ -15,6 +16,10 @@ interface ContentSource {
     fun catalog(type: ContentType): Catalog
     fun episodes(series: Entry): List<Episode>
     fun reset() {}
+
+    /** Grade de programação do canal (se a lista tiver). */
+    val supportsEpg: Boolean get() = false
+    fun epg(entry: Entry): List<Program> = emptyList()
 }
 
 private fun JSONArray.objects(): List<JSONObject> =
@@ -85,6 +90,29 @@ class XtreamSource(account: Account) : ContentSource {
             }
         }
         return Catalog(categories, entries)
+    }
+
+    override val supportsEpg: Boolean get() = true
+
+    override fun epg(entry: Entry): List<Program> {
+        if (entry.type != ContentType.LIVE) return emptyList()
+        val text = api("get_short_epg", "&stream_id=${entry.id}&limit=4").trim()
+        if (!text.startsWith("{")) return emptyList()
+        val arr = JSONObject(text).optJSONArray("epg_listings") ?: return emptyList()
+        return arr.objects().mapNotNull { o ->
+            val start = o.optString("start_timestamp").toLongOrNull() ?: return@mapNotNull null
+            val end = o.optString("stop_timestamp").toLongOrNull()
+                ?: o.optString("end_timestamp").toLongOrNull()
+                ?: return@mapNotNull null
+            Program(decode(o.optString("title")), start * 1000, end * 1000)
+        }.sortedBy { it.start }
+    }
+
+    /** O Xtream manda os títulos em Base64. */
+    private fun decode(s: String): String = try {
+        String(Base64.decode(s, Base64.DEFAULT), Charsets.UTF_8).trim().ifEmpty { s }
+    } catch (e: Exception) {
+        s
     }
 
     override fun episodes(series: Entry): List<Episode> {
